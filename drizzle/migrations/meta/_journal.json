@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791024638894,
+      "tag": "0000_admin_cms",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791024690517,
+      "tag": "0001_single_admin_guard",
+      "breakpoints": true
+    }
+  ]
+}
