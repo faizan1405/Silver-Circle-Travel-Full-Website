@@ -8,7 +8,7 @@ import { SectionIntro } from "@/components/SectionIntro";
 import { FourFeaturedDestinations, PackageCard } from "@/components/TravelCards";
 import { Reveal } from "@/components/Reveal";
 import { Magnetic } from "@/components/Magnetic";
-import slowTravel from "@/assets/slow-travel.jpg";
+import slowTravel from "@/assets/solo-travel.png";
 import { DEFAULT_ENQUIRY, whatsappUrl } from "@/lib/site";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { activeDestinationsQuery, useSiteSettings } from "@/lib/public-queries";
@@ -21,6 +21,8 @@ export const Route = createFileRoute("/")({
     { property: "og:title", content: "Silver Circle Travel | Curated Journeys for 60+" },
     { property: "og:description", content: "Travel freely. We take care of the rest." },
     { property: "og:type", content: "website" },
+    { property: "og:image", content: "/hero-poster.jpg" },
+    { name: "twitter:image", content: "/hero-poster.jpg" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: HomePage,

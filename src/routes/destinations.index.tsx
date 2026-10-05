@@ -19,6 +19,8 @@ export const Route = createFileRoute("/destinations/")({
     { property: "og:title", content: "Destinations | Silver Circle Travel" },
     { property: "og:description", content: "Explore the world at your pace." },
     { property: "og:type", content: "website" },
+    { property: "og:image", content: "/destinations/switzerland.jpg" },
+    { name: "twitter:image", content: "/destinations/switzerland.jpg" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   errorComponent: DestinationsError,

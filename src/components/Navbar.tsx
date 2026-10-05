@@ -48,6 +48,11 @@ export function Navbar() {
               transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)",
               filter: "drop-shadow(0 4px 14px rgba(16,28,60,0.18))",
             }}
+            onError={(e) => {
+              if (e.currentTarget.src !== "/logo.png" && !e.currentTarget.src.endsWith("/logo.png")) {
+                e.currentTarget.src = "/logo.png";
+              }
+            }}
           />
         </Link>
 

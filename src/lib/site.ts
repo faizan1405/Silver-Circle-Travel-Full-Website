@@ -11,18 +11,18 @@ export const SITE = {
 /** Used only if settings cannot be loaded from the backend. */
 export const FALLBACK_SETTINGS: SiteSettings = {
   id: 1,
-  logo_url: "",
-  phone: "",
-  email: "",
-  whatsapp: "",
-  address: "",
+  logo_url: "/logo.png",
+  phone: "+91 99997 18183",
+  email: "care@silvercircletravel.com",
+  whatsapp: "919999718183",
+  address: "Spaze I-Tech Park, Ninth Floor, Tower B-1, 958-960, Badshahpur Sohna Rd, Sector 49, Gurugram, Haryana 122018",
   instagram: "",
   facebook: "",
   linkedin: "",
   youtube: "",
   twitter: "",
-  copyright_text: "",
-  favicon_url: "",
+  copyright_text: "© Silver Circle Travel. All rights reserved.",
+  favicon_url: "/favicon.png",
   updated_at: new Date(0).toISOString(),
 };
 

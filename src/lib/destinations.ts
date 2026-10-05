@@ -40,3 +40,23 @@ export function slugify(value: string) {
 }
 
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export const DESTINATION_ASSET_IMAGES: Record<string, string> = {
+  switzerland: "/destinations/switzerland.jpg",
+  "france-switzerland": "/destinations/france-switzerland.jpg",
+  italy: "/destinations/italy.jpg",
+  "united-kingdom": "/destinations/united-kingdom.jpg",
+  japan: "/destinations/japan.jpg",
+  singapore: "/destinations/singapore.jpg",
+  bali: "/destinations/bali.jpg",
+  thailand: "/destinations/thailand.jpg",
+  dubai: "/destinations/dubai.jpg",
+  turkey: "/destinations/turkey.jpg",
+};
+
+export function resolveDestinationImage(slug: string, currentUrl?: string | null): string {
+  if (currentUrl && !currentUrl.startsWith("/__l5e/")) {
+    return currentUrl;
+  }
+  return DESTINATION_ASSET_IMAGES[slug] ?? `/destinations/${slug}.jpg`;
+}

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImageOff, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
-import { DESTINATION_CATEGORIES, SLUG_PATTERN, TRAVEL_STYLES, discountPercent, formatINR, slugify, type Destination } from "@/lib/destinations";
+import { DESTINATION_CATEGORIES, SLUG_PATTERN, TRAVEL_STYLES, discountPercent, formatINR, resolveDestinationImage, slugify, type Destination } from "@/lib/destinations";
 import { refreshAfterChange } from "@/lib/admin-queries";
 import { FieldError, Panel, btnOutline, btnPrimary, inputCls, labelCls } from "./ui";
 
@@ -26,8 +26,9 @@ function isValidImageUrl(value: string) {
 export function DestinationForm({ initial }: { initial?: Destination }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
-  const [imageStatus, setImageStatus] = useState<"idle" | "loading" | "ok" | "error">(initial?.image_url ? "loading" : "idle");
+  const initialImg = initial ? resolveDestinationImage(initial.slug, initial.image_url) : "";
+  const [imageUrl, setImageUrl] = useState(initialImg);
+  const [imageStatus, setImageStatus] = useState<"idle" | "loading" | "ok" | "error">(initialImg ? "loading" : "idle");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [location, setLocation] = useState(initial?.location ?? "");
   const [country, setCountry] = useState(initial?.country ?? "");

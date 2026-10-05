@@ -7,7 +7,7 @@ import { ExternalLink, Pencil, Plus, Search, Star, Trash2, X } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
-import { DESTINATION_CATEGORIES, formatINR, type Destination } from "@/lib/destinations";
+import { DESTINATION_CATEGORIES, formatINR, resolveDestinationImage, type Destination } from "@/lib/destinations";
 import { adminDestinationsQuery, refreshAfterChange } from "@/lib/admin-queries";
 import { EmptyState, ErrorState, Panel, StatusBadge, TableSkeleton, adminHead, btnOutline, btnPrimary, iconBtn, inputCls } from "@/components/admin/ui";
 
@@ -158,7 +158,7 @@ function DestinationsAdmin() {
               <tbody className="divide-y divide-border">
                 {filtered.map((d) => (
                   <tr key={d.id} className="transition-colors hover:bg-secondary/40">
-                    <td className="px-3 py-3"><img src={d.image_url} alt="" loading="lazy" decoding="async" className="h-12 w-16 rounded-lg object-cover" /></td>
+                    <td className="px-3 py-3"><img src={resolveDestinationImage(d.slug, d.image_url)} alt="" loading="lazy" decoding="async" className="h-12 w-16 rounded-lg object-cover" /></td>
                     <td className="px-3 py-3"><span className="font-semibold text-navy-deep">{d.title}</span><span className="block text-xs text-muted-foreground">/{d.slug}</span></td>
                     <td className="px-3 py-3 text-muted-foreground">{d.country || "—"}</td>
                     <td className="px-3 py-3 text-muted-foreground">{d.category}</td>
@@ -186,7 +186,7 @@ function DestinationsAdmin() {
             {filtered.map((d) => (
               <Panel key={d.id} className="overflow-hidden">
                 <div className="flex gap-4 p-4">
-                  <img src={d.image_url} alt="" loading="lazy" decoding="async" className="h-20 w-24 shrink-0 rounded-xl object-cover" />
+                  <img src={resolveDestinationImage(d.slug, d.image_url)} alt="" loading="lazy" decoding="async" className="h-20 w-24 shrink-0 rounded-xl object-cover" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <p className="truncate font-semibold text-navy-deep">{d.title}</p>

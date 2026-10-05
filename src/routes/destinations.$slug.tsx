@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarDays, Check, Clock3, MapPin, Sparkles } from "lucide
 import { SiteChrome } from "@/components/SiteChrome";
 import { Reveal } from "@/components/Reveal";
 import { Magnetic } from "@/components/Magnetic";
-import { discountPercent, effectivePrice, formatINR } from "@/lib/destinations";
+import { discountPercent, effectivePrice, formatINR, resolveDestinationImage } from "@/lib/destinations";
 import { destinationBySlugQuery, useSiteSettings } from "@/lib/public-queries";
 import { whatsappUrl } from "@/lib/site";
 
@@ -29,8 +29,9 @@ export const Route = createFileRoute("/destinations/$slug")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ];
-    if (/^https:\/\//i.test(d.image_url)) {
-      meta.push({ property: "og:image", content: d.image_url }, { name: "twitter:image", content: d.image_url });
+    const img = resolveDestinationImage(d.slug, d.image_url);
+    if (img) {
+      meta.push({ property: "og:image", content: img }, { name: "twitter:image", content: img });
     }
     return { meta };
   },
@@ -70,11 +71,23 @@ function DestinationDetail() {
   const d = data;
   const price = effectivePrice(d);
   const discount = discountPercent(d);
+  const heroImage = resolveDestinationImage(d.slug, d.image_url);
 
   return (
     <SiteChrome>
       <section className="relative overflow-hidden bg-navy-deep text-white">
-        <img src={d.image_url} alt={`${d.title} travel experience`} className="absolute inset-0 h-full w-full object-cover opacity-55" decoding="async" />
+        <img
+          src={heroImage}
+          alt={`${d.title} travel experience`}
+          className="absolute inset-0 h-full w-full object-cover opacity-55"
+          decoding="async"
+          onError={(e) => {
+            const fallback = `/destinations/${d.slug}.jpg`;
+            if (e.currentTarget.src !== fallback && !e.currentTarget.src.endsWith(fallback)) {
+              e.currentTarget.src = fallback;
+            }
+          }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/60 to-navy-deep/20" />
         <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-44 lg:px-8 lg:pb-28">
           <Reveal>

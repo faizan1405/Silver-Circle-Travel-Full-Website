@@ -20,6 +20,8 @@ export const Route = createFileRoute("/contact")({
     { property: "og:title", content: "Contact Us | Silver Circle Travel" },
     { property: "og:description", content: "Start planning a journey that feels like yours." },
     { property: "og:type", content: "website" },
+    { property: "og:image", content: "/logo.png" },
+    { name: "twitter:image", content: "/logo.png" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: ContactPage,

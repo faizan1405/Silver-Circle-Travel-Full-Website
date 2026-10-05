@@ -19,6 +19,8 @@ export const Route = createFileRoute("/about")({
     { property: "og:title", content: "About Us | Silver Circle Travel" },
     { property: "og:description", content: "Thoughtful travel, beautifully looked after." },
     { property: "og:type", content: "website" },
+    { property: "og:image", content: "/about-hero.jpg" },
+    { name: "twitter:image", content: "/about-hero.jpg" },
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: AboutPage,

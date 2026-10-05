@@ -1,6 +1,6 @@
 import { ArrowUpRight, Check, Clock3, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { type Destination, effectivePrice, formatINR } from "@/lib/destinations";
+import { type Destination, effectivePrice, formatINR, resolveDestinationImage } from "@/lib/destinations";
 import { Reveal } from "./Reveal";
 
 function PriceLine({ destination }: { destination: Destination }) {
@@ -18,11 +18,24 @@ function PriceLine({ destination }: { destination: Destination }) {
 }
 
 export function DestinationCard({ destination, index = 0 }: { destination: Destination; index?: number }) {
+  const imgSrc = resolveDestinationImage(destination.slug, destination.image_url);
   return (
     <Reveal variant={index % 2 ? "right" : "left"} delay={(index % 3) * 80} className="group overflow-hidden rounded-[2rem] bg-card shadow-soft card-tilt interactive-card">
       <Link to="/destinations/$slug" params={{ slug: destination.slug }} className="block" aria-label={`View ${destination.title}`}>
         <div className="relative aspect-[1.2] overflow-hidden">
-          <img src={destination.image_url} alt={`${destination.title} travel experience`} loading={index > 2 ? "lazy" : "eager"} decoding="async" className="img-zoom h-full w-full object-cover" />
+          <img
+            src={imgSrc}
+            alt={`${destination.title} travel experience`}
+            loading={index > 2 ? "lazy" : "eager"}
+            decoding="async"
+            className="img-zoom h-full w-full object-cover"
+            onError={(e) => {
+              const fallback = `/destinations/${destination.slug}.jpg`;
+              if (e.currentTarget.src !== fallback && !e.currentTarget.src.endsWith(fallback)) {
+                e.currentTarget.src = fallback;
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/75 via-transparent to-transparent" />
           <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-white">
             <div>
@@ -50,10 +63,23 @@ export function DestinationCard({ destination, index = 0 }: { destination: Desti
 }
 
 export function PackageCard({ destination, index = 0 }: { destination: Destination; index?: number }) {
+  const imgSrc = resolveDestinationImage(destination.slug, destination.image_url);
   return (
     <Reveal variant="scale" delay={index * 90} className="group interactive-card overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft">
       <Link to="/destinations/$slug" params={{ slug: destination.slug }} className="relative block aspect-[1.45] overflow-hidden">
-        <img src={destination.image_url} alt={`${destination.title} curated journey`} loading="lazy" decoding="async" className="img-zoom h-full w-full object-cover" />
+        <img
+          src={imgSrc}
+          alt={`${destination.title} curated journey`}
+          loading="lazy"
+          decoding="async"
+          className="img-zoom h-full w-full object-cover"
+          onError={(e) => {
+            const fallback = `/destinations/${destination.slug}.jpg`;
+            if (e.currentTarget.src !== fallback && !e.currentTarget.src.endsWith(fallback)) {
+              e.currentTarget.src = fallback;
+            }
+          }}
+        />
         {destination.duration ? <div className="hover-glow absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-navy-deep">{destination.duration}</div> : null}
       </Link>
       <div className="p-6">

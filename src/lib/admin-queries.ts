@@ -1,6 +1,7 @@
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { resolveDestinationImage } from "./destinations";
 
 export type Enquiry = Database["public"]["Tables"]["enquiries"]["Row"];
 export const ENQUIRY_STATUSES = ["New", "Contacted", "Converted", "Closed"] as const;
@@ -53,7 +54,10 @@ export const adminDestinationsQuery = queryOptions({
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw error;
-    return data;
+    return (data ?? []).map((d) => ({
+      ...d,
+      image_url: resolveDestinationImage(d.slug, d.image_url),
+    }));
   },
 });
 
@@ -63,7 +67,11 @@ export const adminDestinationQuery = (id: string) =>
     queryFn: async () => {
       const { data, error } = await supabase.from("destinations").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data;
+      if (!data) return null;
+      return {
+        ...data,
+        image_url: resolveDestinationImage(data.slug, data.image_url),
+      };
     },
   });
 
