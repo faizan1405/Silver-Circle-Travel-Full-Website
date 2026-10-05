@@ -11,3 +11,5 @@
 - Destinations, enquiries and site settings live in Lovable Cloud tables; public pages read them via server functions in src/lib/public-data.functions.ts — never hardcode destination or contact data in components.
 - Admin panel lives under /admin; protected pages are children of the pathless `admin._panel` layout (ssr:false, checks the admin role) and access data through the browser client, with RLS as the security boundary.
 - Exactly one admin: created once via /admin/setup (server fn + unique index on the admin role); public sign-up is disabled.
+- Primary GitHub account and repository: `faizancrypto1-a11y/Silver-Circle-Travel-Full-Website`. All future git pushes for this project must target this repository on `faizancrypto1-a11y`.
+
