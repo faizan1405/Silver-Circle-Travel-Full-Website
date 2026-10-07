@@ -63,9 +63,9 @@ export function Loader() {
       <img
         src={logo.url}
         alt=""
-        width={220}
-        height={220}
-        className="relative h-40 w-40 object-contain sm:h-52 sm:w-52"
+        width={384}
+        height={384}
+        className="relative h-60 w-60 object-contain sm:h-72 sm:w-72 md:h-80 md:w-80 lg:h-96 lg:w-96"
         style={{
           animation: "logo-in 1.1s cubic-bezier(0.22,1,0.36,1) 1.15s both",
           filter: "drop-shadow(0 10px 34px rgba(16,28,60,0.22))",
