@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
-import heroVideo from "@/assets/hero.mp4.asset.json";
-import heroPoster from "@/assets/hero-poster.jpg.asset.json";
 import { Magnetic } from "./Magnetic";
+
+const DESKTOP_SRC = "/videos/hero-pc.mp4";
+const MOBILE_SRC = "/videos/hero-mobile.mp4";
+const DESKTOP_POSTER = "/images/hero-pc-poster.webp";
+const MOBILE_POSTER = "/images/hero-mobile-poster.webp";
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
 
 const revealStyle = (progress: number, start: number, span = 0.12) => {
   const amount = Math.min(Math.max((progress - start) / span, 0), 1);
@@ -22,37 +26,65 @@ export function ScrollVideoHero() {
     const video = videoRef.current;
     if (!wrap || !copy || !video) return;
 
-    // Preload immediately so scrubbing never waits on the network.
-    video.preload = "auto";
-    video.load();
+    let activeSrc = "";
+    let duration = 0;
+    let targetTime = 0;
+    let frame = 0;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const items = Array.from(copy.querySelectorAll<HTMLElement>("[data-hero-line]"));
-    let frame = 0;
-    let duration = 0;
-    // targetTime follows scroll instantly; currentTime eases toward it each
-    // frame so scrubbing feels like butter instead of stuttering keyframes.
-    let targetTime = 0;
 
-    // Keep the video permanently paused; we drive currentTime ourselves.
+    // Keep the video permanently paused; page scroll drives currentTime.
     const keepPaused = () => {
-      if (!video.paused) video.pause();
-    };
-    video.addEventListener("play", keepPaused);
-
-    const measureDuration = () => {
-      if (Number.isFinite(video.duration) && video.duration > 0) {
-        duration = video.duration;
-        // Reserve a hair of tail so we never seek past the last frame.
-        targetTime = Math.min(targetTime, Math.max(duration - 0.05, 0));
+      if (!video.paused) {
+        video.pause();
       }
     };
-    video.addEventListener("loadedmetadata", measureDuration);
-    measureDuration();
+    video.addEventListener("play", keepPaused);
+    keepPaused();
 
     const scrollProgress = () => {
       const total = Math.max(wrap.offsetHeight - window.innerHeight, 1);
       return Math.min(Math.max(-wrap.getBoundingClientRect().top / total, 0), 1);
+    };
+
+    const applyProgressToVideo = (progress: number) => {
+      if (!reduceMotion && duration > 0) {
+        const safeDuration = Math.max(0, duration - 0.05);
+        targetTime = progress * safeDuration;
+      }
+    };
+
+    const measureDuration = () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        duration = video.duration;
+        const progress = scrollProgress();
+        const safeDuration = Math.max(0, duration - 0.05);
+        targetTime = progress * safeDuration;
+        video.currentTime = targetTime;
+      }
+    };
+    video.addEventListener("loadedmetadata", measureDuration);
+
+    const syncSource = () => {
+      const isMobile = window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+      const targetSrc = isMobile ? MOBILE_SRC : DESKTOP_SRC;
+      const targetPoster = isMobile ? MOBILE_POSTER : DESKTOP_POSTER;
+
+      if (activeSrc === targetSrc) return;
+
+      activeSrc = targetSrc;
+      duration = 0;
+
+      video.poster = targetPoster;
+      video.src = targetSrc;
+      video.preload = "auto";
+      video.load();
+
+      // If metadata is already cached, measure immediately
+      if (video.readyState >= 1) {
+        measureDuration();
+      }
     };
 
     const update = () => {
@@ -67,26 +99,33 @@ export function ScrollVideoHero() {
       const fade = progress < 0.82 ? 1 : Math.max(0, 1 - (progress - 0.82) / 0.16);
       copy.style.opacity = `${fade}`;
 
-      if (!reduceMotion && duration > 0) {
-        targetTime = progress * Math.max(duration - 0.05, 0);
-      }
+      applyProgressToVideo(progress);
     };
 
-    // Continuous rAF loop eases the video clock toward the scroll target.
-    // Ease factor tuned for smooth, non-laggy scrubbing at 60fps.
+    // Continuous rAF loop keeps the video clock tightly synchronized with scroll.
+    // Settles immediately when scroll stops (< 50ms) so stop strictly means stop.
+    let rafId = 0;
     const tick = () => {
       if (duration > 0) {
         const diff = targetTime - video.currentTime;
-        if (Math.abs(diff) > 0.004) {
-          // Faster easing when far behind, ultra-fine when close.
-          const ease = Math.abs(diff) > 0.5 ? 0.25 : 0.14;
+        const absDiff = Math.abs(diff);
+        if (absDiff > 0.008) {
+          // Responsive ease that settles in 2-3 frames without sluggish lag
+          const ease = absDiff > 0.25 ? 0.7 : 0.55;
+          const next = video.currentTime + diff * ease;
           video.currentTime = Math.min(
-            Math.max(video.currentTime + diff * ease, 0),
+            Math.max(next, 0),
+            Math.max(duration - 0.05, 0),
+          );
+        } else if (absDiff > 0) {
+          // Snap directly to targetTime so video settles completely when scrolling stops
+          video.currentTime = Math.min(
+            Math.max(targetTime, 0),
             Math.max(duration - 0.05, 0),
           );
         }
       }
-      window.requestAnimationFrame(tick);
+      rafId = window.requestAnimationFrame(tick);
     };
 
     const requestUpdate = () => {
@@ -94,15 +133,28 @@ export function ScrollVideoHero() {
       frame = window.requestAnimationFrame(update);
     };
 
+    const onMediaChange = () => {
+      syncSource();
+      requestUpdate();
+    };
+
+    const mql = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+    mql.addEventListener("change", onMediaChange);
+
+    // Initial sync and calculate state
+    syncSource();
     update();
-    const rafId = window.requestAnimationFrame(tick);
+    rafId = window.requestAnimationFrame(tick);
+
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
+
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
-      window.cancelAnimationFrame(rafId);
+      if (rafId) window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
+      mql.removeEventListener("change", onMediaChange);
       video.removeEventListener("play", keepPaused);
       video.removeEventListener("loadedmetadata", measureDuration);
     };
@@ -113,14 +165,17 @@ export function ScrollVideoHero() {
       <div className="sticky top-0 h-screen min-h-[38rem] w-full overflow-hidden bg-navy-deep">
         <video
           ref={videoRef}
-          src={heroVideo.url}
-          poster={heroPoster.url}
+          poster={DESKTOP_POSTER}
           muted
           playsInline
-          preload="auto"
+          webkit-playsinline="true"
           disablePictureInPicture
+          disableRemotePlayback
           controls={false}
-          className="absolute inset-0 h-full w-full object-cover will-change-transform"
+          preload="none"
+          className="absolute inset-0 h-full w-full object-cover object-center will-change-transform"
+          aria-hidden="true"
+          tabIndex={-1}
         />
         <div className="hero-video-shade absolute inset-0" />
 
