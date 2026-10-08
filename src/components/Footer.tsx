@@ -104,8 +104,28 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <p>{copyright}</p>
+          <p className="text-white/55">
+            Designed by{" "}
+            <a
+              href="https://joinscaleflow.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white/80 underline-offset-4 transition-colors duration-300 hover:text-gold hover:underline focus-visible:text-gold focus-visible:underline focus-visible:outline-none"
+            >
+              Scale Flow
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://rankzio.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white/80 underline-offset-4 transition-colors duration-300 hover:text-gold hover:underline focus-visible:text-gold focus-visible:underline focus-visible:outline-none"
+            >
+              Rank Zio
+            </a>
+          </p>
           <p>Gurugram, India</p>
         </div>
       </div>
